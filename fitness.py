@@ -1,7 +1,7 @@
 from typing import Callable, List, Tuple
 from dsl import Grid
 import numpy as np
-from grammar import GridExpression
+from grammar import GridExpression, InputGrid
 from utils import (
     calculate_pixel_fitness,
     calculate_shape_fitness,
@@ -115,10 +115,11 @@ def train_fitness_function(individual, task: Task):
             f"{individual.__class__.__name__} {np.mean(all_scores):.2f} - {hack['best']:.2f}"
         )
 
+    if isinstance(individual, InputGrid):
+        return [-1] * len(all_scores)
+
     # Program simply returns input grid
     num_nodes = count_nodes(individual)
-    if num_nodes == 1:
-        return [-1] * len(all_scores)
 
     if not program_uses_input(individual):
         return [-1] * len(all_scores)

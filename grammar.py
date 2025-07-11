@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from geneticengine.grammar import extract_grammar
 from geneticengine.prelude import abstract
 from geneticengine.grammar.decorators import weight
-import dsl
+import optimized_dsl
 
 
 @abstract
@@ -24,7 +24,7 @@ class Expression(ABC):
 
 @abstract
 class NumericalExpression(Expression):
-    def evaluate(self, *args, **kwargs) -> dsl.Numerical: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Numerical: ...
 
 
 @abstract
@@ -34,22 +34,22 @@ class BooleanExpression(Expression):
 
 @abstract
 class GridExpression(Expression):
-    def evaluate(self, *args, **kwargs) -> dsl.Grid: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid: ...
 
 
 @abstract
 class ObjectExpression(Expression):
-    def evaluate(self, *args, **kwargs) -> dsl.Object: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Object: ...
 
 
 @abstract
 class ObjectsExpression(Expression):
-    def evaluate(self, *args, **kwargs) -> dsl.Objects: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects: ...
 
 
 @abstract
 class IndicesExpression(Expression):
-    def evaluate(self, *args, **kwargs) -> dsl.Indices: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices: ...
 
 
 @abstract
@@ -82,28 +82,28 @@ class FrozenSetExpression(ContainerExpression):
 class CallableExpression(Expression):
     """An expression that evaluates to a callable function."""
 
-    def evaluate(self, *args, **kwargs) -> dsl.Callable: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Callable: ...
 
 
 @abstract
 class PatchExpression(Expression):
     """An expression that evaluates to a Patch (Object or Indices)."""
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch: ...
 
 
 @abstract
 class ElementExpression(Expression):
     """An expression that evaluates to an Element (Object or Grid)."""
 
-    def evaluate(self, *args, **kwargs) -> dsl.Element: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Element: ...
 
 
 @abstract
 class PieceExpression(Expression):
     """An expression that evaluates to a Piece (Grid or Patch)."""
 
-    def evaluate(self, *args, **kwargs) -> dsl.Piece: ...
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Piece: ...
 
 
 # ======================================================================================
@@ -127,7 +127,7 @@ class Constant(IntegerExpression):
 class InputGrid(GridExpression):
     """A typed input node specifically for the ARC task grid."""
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
         return kwargs.get("input_grid", tuple())
 
     def __str__(self) -> str:
@@ -145,7 +145,7 @@ class Identity(Expression):
     x: Expression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.identity(self.x.evaluate(**kwargs))
+        return optimized_dsl.identity(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -155,7 +155,9 @@ class AddInteger(IntegerExpression):
     right: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.add(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+        return optimized_dsl.add(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -164,8 +166,10 @@ class AddTuple(TupleExpression):
     left: TupleExpression
     right: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.add(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.add(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -175,7 +179,9 @@ class SubtractInteger(IntegerExpression):
     right: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.subtract(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+        return optimized_dsl.subtract(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -184,8 +190,10 @@ class SubtractTuple(TupleExpression):
     left: TupleExpression
     right: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.subtract(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.subtract(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -195,7 +203,9 @@ class MultiplyInteger(IntegerExpression):
     right: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.multiply(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+        return optimized_dsl.multiply(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -204,8 +214,10 @@ class MultiplyTuple(TupleExpression):
     left: TupleExpression
     right: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.multiply(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.multiply(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -215,7 +227,9 @@ class DivideInteger(IntegerExpression):
     right: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.divide(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+        return optimized_dsl.divide(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -224,8 +238,10 @@ class DivideTuple(TupleExpression):
     left: TupleExpression
     right: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.divide(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.divide(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -234,7 +250,7 @@ class InvertInteger(IntegerExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.invert(self.n.evaluate(**kwargs))
+        return optimized_dsl.invert(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -242,8 +258,8 @@ class InvertInteger(IntegerExpression):
 class InvertTuple(TupleExpression):
     n: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.invert(self.n.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.invert(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -252,7 +268,7 @@ class Even(BooleanExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.even(self.n.evaluate(**kwargs))
+        return optimized_dsl.even(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -261,7 +277,7 @@ class DoubleInteger(IntegerExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.double(self.n.evaluate(**kwargs))
+        return optimized_dsl.double(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -269,8 +285,8 @@ class DoubleInteger(IntegerExpression):
 class DoubleTuple(TupleExpression):
     n: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.double(self.n.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.double(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -279,7 +295,7 @@ class HalveInteger(IntegerExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.halve(self.n.evaluate(**kwargs))
+        return optimized_dsl.halve(self.n.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -287,8 +303,8 @@ class HalveInteger(IntegerExpression):
 class HalveTuple(TupleExpression):
     n: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.halve(self.n.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.halve(self.n.evaluate(**kwargs))
 
 
 @weight(25)
@@ -297,7 +313,7 @@ class Flip(BooleanExpression):
     b: BooleanExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.flip(self.b.evaluate(**kwargs))
+        return optimized_dsl.flip(self.b.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -307,7 +323,9 @@ class Equality(BooleanExpression):
     right: Expression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.equality(self.left.evaluate(**kwargs), self.right.evaluate(**kwargs))
+        return optimized_dsl.equality(
+            self.left.evaluate(**kwargs), self.right.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -319,7 +337,7 @@ class Contained(BooleanExpression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.contained(
+        return optimized_dsl.contained(
             self.value.evaluate(**kwargs), self.container.evaluate(**kwargs)
         )
 
@@ -333,7 +351,9 @@ class Combine(ContainerExpression):
     b: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.combine(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.combine(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -345,7 +365,9 @@ class Intersection(FrozenSetExpression):
     b: FrozenSetExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.intersection(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.intersection(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -357,7 +379,9 @@ class Difference(FrozenSetExpression):
     b: FrozenSetExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.difference(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.difference(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -368,7 +392,7 @@ class Dedupe(TupleExpression):
     tup: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.dedupe(self.tup.evaluate(**kwargs))
+        return optimized_dsl.dedupe(self.tup.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -380,7 +404,7 @@ class Order(TupleExpression):
     compfunc: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.order(
+        return optimized_dsl.order(
             self.container.evaluate(**kwargs), self.compfunc.evaluate(**kwargs)
         )
 
@@ -394,7 +418,9 @@ class Repeat(TupleExpression):
     num: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.repeat(self.item.evaluate(**kwargs), self.num.evaluate(**kwargs))
+        return optimized_dsl.repeat(
+            self.item.evaluate(**kwargs), self.num.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -406,7 +432,9 @@ class Greater(BooleanExpression):
     b: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.greater(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.greater(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -417,7 +445,7 @@ class Size(IntegerExpression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.size(self.container.evaluate(**kwargs))
+        return optimized_dsl.size(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -428,7 +456,7 @@ class Merge(ContainerExpression):
     containers: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.merge(self.containers.evaluate(**kwargs))
+        return optimized_dsl.merge(self.containers.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -439,7 +467,7 @@ class Maximum(IntegerExpression):
     container: FrozenSetExpression  # Specifically IntegerSet
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.maximum(self.container.evaluate(**kwargs))
+        return optimized_dsl.maximum(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -450,7 +478,7 @@ class Minimum(IntegerExpression):
     container: FrozenSetExpression  # Specifically IntegerSet
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.minimum(self.container.evaluate(**kwargs))
+        return optimized_dsl.minimum(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -462,7 +490,7 @@ class Valmax(IntegerExpression):
     compfunc: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.valmax(
+        return optimized_dsl.valmax(
             self.container.evaluate(**kwargs), self.compfunc.evaluate(**kwargs)
         )
 
@@ -476,7 +504,7 @@ class Valmin(IntegerExpression):
     compfunc: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.valmin(
+        return optimized_dsl.valmin(
             self.container.evaluate(**kwargs), self.compfunc.evaluate(**kwargs)
         )
 
@@ -490,7 +518,7 @@ class Argmax(Expression):
     compfunc: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.argmax(
+        return optimized_dsl.argmax(
             self.container.evaluate(**kwargs), self.compfunc.evaluate(**kwargs)
         )
 
@@ -504,7 +532,7 @@ class Argmin(Expression):
     compfunc: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.argmin(
+        return optimized_dsl.argmin(
             self.container.evaluate(**kwargs), self.compfunc.evaluate(**kwargs)
         )
 
@@ -517,7 +545,7 @@ class MostCommon(Expression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.mostcommon(self.container.evaluate(**kwargs))
+        return optimized_dsl.mostcommon(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -528,7 +556,7 @@ class LeastCommon(Expression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.leastcommon(self.container.evaluate(**kwargs))
+        return optimized_dsl.leastcommon(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -539,7 +567,7 @@ class Initset(FrozenSetExpression):
     value: Expression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.initset(self.value.evaluate(**kwargs))
+        return optimized_dsl.initset(self.value.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -551,7 +579,7 @@ class Both(BooleanExpression):
     b: BooleanExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.both(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.both(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -563,7 +591,9 @@ class Either(BooleanExpression):
     b: BooleanExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.either(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.either(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -574,7 +604,7 @@ class IncrementInteger(IntegerExpression):
     x: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.increment(self.x.evaluate(**kwargs))
+        return optimized_dsl.increment(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -582,8 +612,8 @@ class IncrementInteger(IntegerExpression):
 class IncrementTuple(TupleExpression):
     x: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.increment(self.x.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.increment(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -594,7 +624,7 @@ class DecrementInteger(IntegerExpression):
     x: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.decrement(self.x.evaluate(**kwargs))
+        return optimized_dsl.decrement(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -602,8 +632,8 @@ class DecrementInteger(IntegerExpression):
 class DecrementTuple(TupleExpression):
     x: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.decrement(self.x.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.decrement(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -614,7 +644,7 @@ class CrementInteger(IntegerExpression):
     x: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.crement(self.x.evaluate(**kwargs))
+        return optimized_dsl.crement(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -622,8 +652,8 @@ class CrementInteger(IntegerExpression):
 class CrementTuple(TupleExpression):
     x: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.crement(self.x.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.crement(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -634,7 +664,7 @@ class SignInteger(IntegerExpression):
     x: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.sign(self.x.evaluate(**kwargs))
+        return optimized_dsl.sign(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -642,8 +672,8 @@ class SignInteger(IntegerExpression):
 class SignTuple(TupleExpression):
     x: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.sign(self.x.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.sign(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -654,7 +684,7 @@ class Positive(BooleanExpression):
     x: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.positive(self.x.evaluate(**kwargs))
+        return optimized_dsl.positive(self.x.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -664,8 +694,8 @@ class Toivec(TupleExpression):
 
     i: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.toivec(self.i.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.toivec(self.i.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -675,8 +705,8 @@ class Tojvec(TupleExpression):
 
     j: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.tojvec(self.j.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.tojvec(self.j.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -688,7 +718,7 @@ class Sfilter(ContainerExpression):
     condition: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.sfilter(
+        return optimized_dsl.sfilter(
             self.container.evaluate(**kwargs), self.condition.evaluate(**kwargs)
         )
 
@@ -702,7 +732,7 @@ class Mfilter(FrozenSetExpression):
     function: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.mfilter(
+        return optimized_dsl.mfilter(
             self.container.evaluate(**kwargs), self.function.evaluate(**kwargs)
         )
 
@@ -716,7 +746,7 @@ class Extract(Expression):
     condition: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.extract(
+        return optimized_dsl.extract(
             self.container.evaluate(**kwargs), self.condition.evaluate(**kwargs)
         )
 
@@ -729,7 +759,7 @@ class Totuple(TupleExpression):
     container: FrozenSetExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.totuple(self.container.evaluate(**kwargs))
+        return optimized_dsl.totuple(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -740,7 +770,7 @@ class First(Expression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.first(self.container.evaluate(**kwargs))
+        return optimized_dsl.first(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -751,7 +781,7 @@ class Last(Expression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.last(self.container.evaluate(**kwargs))
+        return optimized_dsl.last(self.container.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -763,7 +793,7 @@ class Insert(FrozenSetExpression):
     container: FrozenSetExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.insert(
+        return optimized_dsl.insert(
             self.value.evaluate(**kwargs), self.container.evaluate(**kwargs)
         )
 
@@ -777,7 +807,7 @@ class Remove(ContainerExpression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.remove(
+        return optimized_dsl.remove(
             self.value.evaluate(**kwargs), self.container.evaluate(**kwargs)
         )
 
@@ -791,7 +821,7 @@ class Other(Expression):
     value: Expression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.other(
+        return optimized_dsl.other(
             self.container.evaluate(**kwargs), self.value.evaluate(**kwargs)
         )
 
@@ -806,7 +836,7 @@ class Interval(TupleExpression):
     step: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.interval(
+        return optimized_dsl.interval(
             self.start.evaluate(**kwargs),
             self.stop.evaluate(**kwargs),
             self.step.evaluate(**kwargs),
@@ -821,8 +851,10 @@ class Astuple(TupleExpression):
     a: IntegerExpression
     b: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.astuple(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.astuple(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -834,7 +866,9 @@ class Product(FrozenSetExpression):
     b: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.product(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.product(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -845,8 +879,8 @@ class Pair(TupleExpression):
     a: TupleExpression
     b: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.TupleTuple:
-        return dsl.pair(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.TupleTuple:
+        return optimized_dsl.pair(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -859,7 +893,7 @@ class Branch(Expression):
     b: Expression
 
     def evaluate(self, *args, **kwargs) -> Any:
-        return dsl.branch(
+        return optimized_dsl.branch(
             self.condition.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -875,7 +909,9 @@ class Compose(CallableExpression):
     inner: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.compose(self.outer.evaluate(**kwargs), self.inner.evaluate(**kwargs))
+        return optimized_dsl.compose(
+            self.outer.evaluate(**kwargs), self.inner.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -888,7 +924,7 @@ class Chain(CallableExpression):
     f: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.chain(
+        return optimized_dsl.chain(
             self.h.evaluate(**kwargs),
             self.g.evaluate(**kwargs),
             self.f.evaluate(**kwargs),
@@ -904,7 +940,7 @@ class Matcher(CallableExpression):
     target: Expression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.matcher(
+        return optimized_dsl.matcher(
             self.function.evaluate(**kwargs), self.target.evaluate(**kwargs)
         )
 
@@ -918,7 +954,7 @@ class Rbind(CallableExpression):
     fixed: Expression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.rbind(
+        return optimized_dsl.rbind(
             self.function.evaluate(**kwargs), self.fixed.evaluate(**kwargs)
         )
 
@@ -932,7 +968,7 @@ class Lbind(CallableExpression):
     fixed: Expression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.lbind(
+        return optimized_dsl.lbind(
             self.function.evaluate(**kwargs), self.fixed.evaluate(**kwargs)
         )
 
@@ -946,7 +982,9 @@ class Power(CallableExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.power(self.function.evaluate(**kwargs), self.n.evaluate(**kwargs))
+        return optimized_dsl.power(
+            self.function.evaluate(**kwargs), self.n.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -959,7 +997,7 @@ class Fork(CallableExpression):
     b: CallableExpression
 
     def evaluate(self, *args, **kwargs) -> Callable:
-        return dsl.fork(
+        return optimized_dsl.fork(
             self.outer.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -975,7 +1013,7 @@ class Apply(ContainerExpression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.apply(
+        return optimized_dsl.apply(
             self.function.evaluate(**kwargs), self.container.evaluate(**kwargs)
         )
 
@@ -989,7 +1027,7 @@ class Rapply(ContainerExpression):
     value: Expression
 
     def evaluate(self, *args, **kwargs) -> Container:
-        return dsl.rapply(
+        return optimized_dsl.rapply(
             self.functions.evaluate(**kwargs), self.value.evaluate(**kwargs)
         )
 
@@ -1003,7 +1041,7 @@ class Mapply(FrozenSetExpression):
     container: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.mapply(
+        return optimized_dsl.mapply(
             self.function.evaluate(**kwargs), self.container.evaluate(**kwargs)
         )
 
@@ -1018,7 +1056,7 @@ class Papply(TupleExpression):
     b: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.papply(
+        return optimized_dsl.papply(
             self.function.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -1035,7 +1073,7 @@ class Mpapply(TupleExpression):
     b: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.mpapply(
+        return optimized_dsl.mpapply(
             self.function.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -1052,7 +1090,7 @@ class Prapply(FrozenSetExpression):
     b: ContainerExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.prapply(
+        return optimized_dsl.prapply(
             self.function.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -1067,7 +1105,7 @@ class Mostcolor(IntegerExpression):
     element: ElementExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.mostcolor(self.element.evaluate(**kwargs))
+        return optimized_dsl.mostcolor(self.element.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1078,7 +1116,7 @@ class Leastcolor(IntegerExpression):
     element: ElementExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.leastcolor(self.element.evaluate(**kwargs))
+        return optimized_dsl.leastcolor(self.element.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1089,7 +1127,7 @@ class Height(IntegerExpression):
     piece: PieceExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.height(self.piece.evaluate(**kwargs))
+        return optimized_dsl.height(self.piece.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1100,7 +1138,7 @@ class Width(IntegerExpression):
     piece: PieceExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.width(self.piece.evaluate(**kwargs))
+        return optimized_dsl.width(self.piece.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1110,8 +1148,8 @@ class Shape(TupleExpression):
 
     piece: PieceExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.shape(self.piece.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.shape(self.piece.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1122,7 +1160,7 @@ class Portrait(BooleanExpression):
     piece: PieceExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.portrait(self.piece.evaluate(**kwargs))
+        return optimized_dsl.portrait(self.piece.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1134,7 +1172,7 @@ class Colorcount(IntegerExpression):
     value: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.colorcount(
+        return optimized_dsl.colorcount(
             self.element.evaluate(**kwargs), self.value.evaluate(**kwargs)
         )
 
@@ -1147,8 +1185,8 @@ class Colorfilter(ObjectsExpression):
     objs: ObjectsExpression
     value: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Objects:
-        return dsl.colorfilter(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects:
+        return optimized_dsl.colorfilter(
             self.objs.evaluate(**kwargs), self.value.evaluate(**kwargs)
         )
 
@@ -1162,7 +1200,7 @@ class Sizefilter(FrozenSetExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> FrozenSet:
-        return dsl.sizefilter(
+        return optimized_dsl.sizefilter(
             self.container.evaluate(**kwargs), self.n.evaluate(**kwargs)
         )
 
@@ -1174,8 +1212,8 @@ class Asindices(IndicesExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.asindices(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.asindices(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1186,8 +1224,10 @@ class Ofcolor(IndicesExpression):
     grid: GridExpression
     value: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.ofcolor(self.grid.evaluate(**kwargs), self.value.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.ofcolor(
+            self.grid.evaluate(**kwargs), self.value.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1197,8 +1237,8 @@ class Ulcorner(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.ulcorner(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.ulcorner(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1208,8 +1248,8 @@ class Urcorner(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.urcorner(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.urcorner(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1219,8 +1259,8 @@ class Llcorner(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.llcorner(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.llcorner(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1230,8 +1270,8 @@ class Lrcorner(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.lrcorner(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.lrcorner(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1243,8 +1283,8 @@ class Crop(GridExpression):
     start: TupleExpression
     dims: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.crop(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.crop(
             self.grid.evaluate(**kwargs),
             self.start.evaluate(**kwargs),
             self.dims.evaluate(**kwargs),
@@ -1258,8 +1298,8 @@ class Toindices(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.toindices(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.toindices(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1270,8 +1310,10 @@ class Recolor(ObjectExpression):
     value: IntegerExpression
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Object:
-        return dsl.recolor(self.value.evaluate(**kwargs), self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Object:
+        return optimized_dsl.recolor(
+            self.value.evaluate(**kwargs), self.patch.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1282,8 +1324,8 @@ class Shift(PatchExpression):
     patch: PatchExpression
     directions: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.shift(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.shift(
             self.patch.evaluate(**kwargs), self.directions.evaluate(**kwargs)
         )
 
@@ -1295,8 +1337,8 @@ class Normalize(PatchExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.normalize(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.normalize(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1306,8 +1348,8 @@ class Dneighbors(IndicesExpression):
 
     loc: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.dneighbors(self.loc.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.dneighbors(self.loc.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1317,8 +1359,8 @@ class Ineighbors(IndicesExpression):
 
     loc: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.ineighbors(self.loc.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.ineighbors(self.loc.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1328,8 +1370,8 @@ class Neighbors(IndicesExpression):
 
     loc: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.neighbors(self.loc.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.neighbors(self.loc.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1342,8 +1384,8 @@ class ObjectsFromGrid(ObjectsExpression):
     diagonal: BooleanExpression
     without_bg: BooleanExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Objects:
-        return dsl.objects(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects:
+        return optimized_dsl.objects(
             self.grid.evaluate(**kwargs),
             self.univalued.evaluate(**kwargs),
             self.diagonal.evaluate(**kwargs),
@@ -1358,8 +1400,8 @@ class Partition(ObjectsExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Objects:
-        return dsl.partition(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects:
+        return optimized_dsl.partition(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1369,8 +1411,8 @@ class Fgpartition(ObjectsExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Objects:
-        return dsl.fgpartition(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects:
+        return optimized_dsl.fgpartition(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1381,7 +1423,7 @@ class Uppermost(IntegerExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.uppermost(self.patch.evaluate(**kwargs))
+        return optimized_dsl.uppermost(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1392,7 +1434,7 @@ class Lowermost(IntegerExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.lowermost(self.patch.evaluate(**kwargs))
+        return optimized_dsl.lowermost(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1403,7 +1445,7 @@ class Leftmost(IntegerExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.leftmost(self.patch.evaluate(**kwargs))
+        return optimized_dsl.leftmost(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1414,7 +1456,7 @@ class Rightmost(IntegerExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.rightmost(self.patch.evaluate(**kwargs))
+        return optimized_dsl.rightmost(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1425,7 +1467,7 @@ class Square(BooleanExpression):
     piece: PieceExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.square(self.piece.evaluate(**kwargs))
+        return optimized_dsl.square(self.piece.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1436,7 +1478,7 @@ class Vline(BooleanExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.vline(self.patch.evaluate(**kwargs))
+        return optimized_dsl.vline(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1447,7 +1489,7 @@ class Hline(BooleanExpression):
     patch: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.hline(self.patch.evaluate(**kwargs))
+        return optimized_dsl.hline(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1459,7 +1501,9 @@ class Hmatching(BooleanExpression):
     b: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.hmatching(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.hmatching(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1471,7 +1515,9 @@ class Vmatching(BooleanExpression):
     b: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.vmatching(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.vmatching(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1483,7 +1529,9 @@ class Manhattan(IntegerExpression):
     b: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.manhattan(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.manhattan(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1495,7 +1543,9 @@ class Adjacent(BooleanExpression):
     b: PatchExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.adjacent(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+        return optimized_dsl.adjacent(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1507,7 +1557,7 @@ class Bordering(BooleanExpression):
     grid: GridExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
-        return dsl.bordering(
+        return optimized_dsl.bordering(
             self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs)
         )
 
@@ -1519,8 +1569,8 @@ class Centerofmass(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.centerofmass(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.centerofmass(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1530,8 +1580,8 @@ class Palette(FrozenSetExpression):
 
     element: ElementExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.palette(self.element.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.palette(self.element.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1542,7 +1592,7 @@ class Numcolors(IntegerExpression):
     element: ElementExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.numcolors(self.element.evaluate(**kwargs))
+        return optimized_dsl.numcolors(self.element.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1553,7 +1603,7 @@ class Color(IntegerExpression):
     obj: ObjectExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.color(self.obj.evaluate(**kwargs))
+        return optimized_dsl.color(self.obj.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1564,8 +1614,10 @@ class Toobject(ObjectExpression):
     patch: PatchExpression
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Object:
-        return dsl.toobject(self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Object:
+        return optimized_dsl.toobject(
+            self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1575,8 +1627,8 @@ class Asobject(ObjectExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Object:
-        return dsl.asobject(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Object:
+        return optimized_dsl.asobject(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1586,8 +1638,8 @@ class Rot90(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.rot90(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.rot90(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1597,8 +1649,8 @@ class Rot180(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.rot180(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.rot180(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1608,8 +1660,8 @@ class Rot270(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.rot270(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.rot270(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1619,8 +1671,8 @@ class HmirrorGrid(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.hmirror(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.hmirror(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1630,8 +1682,8 @@ class HmirrorPatch(PatchExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.hmirror(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.hmirror(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1641,8 +1693,8 @@ class VmirrorGrid(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.vmirror(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.vmirror(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1652,8 +1704,8 @@ class VmirrorPatch(PatchExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.vmirror(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.vmirror(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1663,8 +1715,8 @@ class DmirrorGrid(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.dmirror(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.dmirror(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1674,8 +1726,8 @@ class DmirrorPatch(PatchExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.dmirror(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.dmirror(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1685,8 +1737,8 @@ class CmirrorGrid(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.cmirror(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.cmirror(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1696,8 +1748,8 @@ class CmirrorPatch(PatchExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Patch:
-        return dsl.cmirror(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Patch:
+        return optimized_dsl.cmirror(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1709,8 +1761,8 @@ class Fill(GridExpression):
     value: IntegerExpression
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.fill(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.fill(
             self.grid.evaluate(**kwargs),
             self.value.evaluate(**kwargs),
             self.patch.evaluate(**kwargs),
@@ -1725,8 +1777,10 @@ class Paint(GridExpression):
     grid: GridExpression
     obj: ObjectExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.paint(self.grid.evaluate(**kwargs), self.obj.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.paint(
+            self.grid.evaluate(**kwargs), self.obj.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1738,8 +1792,8 @@ class Underfill(GridExpression):
     value: IntegerExpression
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.underfill(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.underfill(
             self.grid.evaluate(**kwargs),
             self.value.evaluate(**kwargs),
             self.patch.evaluate(**kwargs),
@@ -1754,8 +1808,10 @@ class Underpaint(GridExpression):
     grid: GridExpression
     obj: ObjectExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.underpaint(self.grid.evaluate(**kwargs), self.obj.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.underpaint(
+            self.grid.evaluate(**kwargs), self.obj.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1766,8 +1822,8 @@ class Hupscale(GridExpression):
     grid: GridExpression
     factor: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.hupscale(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.hupscale(
             self.grid.evaluate(**kwargs), self.factor.evaluate(**kwargs)
         )
 
@@ -1780,8 +1836,8 @@ class Vupscale(GridExpression):
     grid: GridExpression
     factor: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.vupscale(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.vupscale(
             self.grid.evaluate(**kwargs), self.factor.evaluate(**kwargs)
         )
 
@@ -1794,8 +1850,10 @@ class UpscaleGrid(GridExpression):
     grid: GridExpression
     factor: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.upscale(self.grid.evaluate(**kwargs), self.factor.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.upscale(
+            self.grid.evaluate(**kwargs), self.factor.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1806,8 +1864,8 @@ class UpscaleObject(ObjectExpression):
     object: ObjectExpression
     factor: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Object:
-        return dsl.upscale(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Object:
+        return optimized_dsl.upscale(
             self.object.evaluate(**kwargs), self.factor.evaluate(**kwargs)
         )
 
@@ -1820,8 +1878,8 @@ class Downscale(GridExpression):
     grid: GridExpression
     factor: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.downscale(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.downscale(
             self.grid.evaluate(**kwargs), self.factor.evaluate(**kwargs)
         )
 
@@ -1834,8 +1892,10 @@ class Hconcat(GridExpression):
     a: GridExpression
     b: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.hconcat(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.hconcat(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1846,8 +1906,10 @@ class Vconcat(GridExpression):
     a: GridExpression
     b: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.vconcat(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.vconcat(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1858,8 +1920,10 @@ class Subgrid(GridExpression):
     patch: PatchExpression
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.subgrid(self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.subgrid(
+            self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1871,7 +1935,9 @@ class Hsplit(TupleExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.hsplit(self.grid.evaluate(**kwargs), self.n.evaluate(**kwargs))
+        return optimized_dsl.hsplit(
+            self.grid.evaluate(**kwargs), self.n.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1883,7 +1949,9 @@ class Vsplit(TupleExpression):
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> Tuple:
-        return dsl.vsplit(self.grid.evaluate(**kwargs), self.n.evaluate(**kwargs))
+        return optimized_dsl.vsplit(
+            self.grid.evaluate(**kwargs), self.n.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1895,8 +1963,8 @@ class Cellwise(GridExpression):
     b: GridExpression
     fallback: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.cellwise(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.cellwise(
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
             self.fallback.evaluate(**kwargs),
@@ -1912,8 +1980,8 @@ class Replace(GridExpression):
     replacee: IntegerExpression
     replacer: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.replace(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.replace(
             self.grid.evaluate(**kwargs),
             self.replacee.evaluate(**kwargs),
             self.replacer.evaluate(**kwargs),
@@ -1929,8 +1997,8 @@ class Switch(GridExpression):
     a: IntegerExpression
     b: IntegerExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.switch(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.switch(
             self.grid.evaluate(**kwargs),
             self.a.evaluate(**kwargs),
             self.b.evaluate(**kwargs),
@@ -1944,8 +2012,8 @@ class Center(TupleExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.center(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.center(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -1956,8 +2024,10 @@ class Position(TupleExpression):
     a: PatchExpression
     b: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.position(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.position(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1969,7 +2039,9 @@ class Index(IntegerExpression):
     loc: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.index(self.grid.evaluate(**kwargs), self.loc.evaluate(**kwargs))
+        return optimized_dsl.index(
+            self.grid.evaluate(**kwargs), self.loc.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -1980,8 +2052,8 @@ class Canvas(GridExpression):
     value: IntegerExpression
     dimensions: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.canvas(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.canvas(
             self.value.evaluate(**kwargs), self.dimensions.evaluate(**kwargs)
         )
 
@@ -1993,8 +2065,8 @@ class Corners(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.corners(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.corners(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2005,8 +2077,10 @@ class Connect(IndicesExpression):
     a: TupleExpression
     b: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.connect(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.connect(
+            self.a.evaluate(**kwargs), self.b.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -2017,8 +2091,10 @@ class Cover(GridExpression):
     grid: GridExpression
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.cover(self.grid.evaluate(**kwargs), self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.cover(
+            self.grid.evaluate(**kwargs), self.patch.evaluate(**kwargs)
+        )
 
 
 @dataclass(unsafe_hash=True)
@@ -2028,8 +2104,8 @@ class Trim(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.trim(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.trim(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2041,8 +2117,8 @@ class Move(GridExpression):
     obj: ObjectExpression
     offset: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.move(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.move(
             self.grid.evaluate(**kwargs),
             self.obj.evaluate(**kwargs),
             self.offset.evaluate(**kwargs),
@@ -2056,8 +2132,8 @@ class Tophalf(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.tophalf(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.tophalf(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2067,8 +2143,8 @@ class Bottomhalf(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.bottomhalf(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.bottomhalf(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2078,8 +2154,8 @@ class Lefthalf(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.lefthalf(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.lefthalf(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2089,8 +2165,8 @@ class Righthalf(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.righthalf(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.righthalf(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2100,8 +2176,8 @@ class Vfrontier(IndicesExpression):
 
     location: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.vfrontier(self.location.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.vfrontier(self.location.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2111,8 +2187,8 @@ class Hfrontier(IndicesExpression):
 
     location: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.hfrontier(self.location.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.hfrontier(self.location.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2122,8 +2198,8 @@ class Backdrop(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.backdrop(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.backdrop(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2133,8 +2209,8 @@ class Delta(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.delta(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.delta(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2145,8 +2221,8 @@ class Gravitate(TupleExpression):
     source: PatchExpression
     destination: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
-        return dsl.gravitate(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
+        return optimized_dsl.gravitate(
             self.source.evaluate(**kwargs), self.destination.evaluate(**kwargs)
         )
 
@@ -2158,8 +2234,8 @@ class Inbox(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.inbox(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.inbox(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2169,8 +2245,8 @@ class Outbox(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.outbox(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.outbox(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2180,8 +2256,8 @@ class Box(IndicesExpression):
 
     patch: PatchExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.box(self.patch.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.box(self.patch.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2192,8 +2268,8 @@ class Shoot(IndicesExpression):
     start: TupleExpression
     direction: TupleExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.shoot(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.shoot(
             self.start.evaluate(**kwargs), self.direction.evaluate(**kwargs)
         )
 
@@ -2206,8 +2282,8 @@ class Occurrences(IndicesExpression):
     grid: GridExpression
     obj: ObjectExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Indices:
-        return dsl.occurrences(
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Indices:
+        return optimized_dsl.occurrences(
             self.grid.evaluate(**kwargs), self.obj.evaluate(**kwargs)
         )
 
@@ -2219,8 +2295,8 @@ class Frontiers(ObjectsExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Objects:
-        return dsl.frontiers(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Objects:
+        return optimized_dsl.frontiers(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2230,8 +2306,8 @@ class Compress(GridExpression):
 
     grid: GridExpression
 
-    def evaluate(self, *args, **kwargs) -> dsl.Grid:
-        return dsl.compress(self.grid.evaluate(**kwargs))
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.Grid:
+        return optimized_dsl.compress(self.grid.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2242,7 +2318,7 @@ class Hperiod(IntegerExpression):
     obj: ObjectExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.hperiod(self.obj.evaluate(**kwargs))
+        return optimized_dsl.hperiod(self.obj.evaluate(**kwargs))
 
 
 @dataclass(unsafe_hash=True)
@@ -2253,7 +2329,7 @@ class Vperiod(IntegerExpression):
     obj: ObjectExpression
 
     def evaluate(self, *args, **kwargs) -> int:
-        return dsl.vperiod(self.obj.evaluate(**kwargs))
+        return optimized_dsl.vperiod(self.obj.evaluate(**kwargs))
 
 
 # ======================================================================================
@@ -2414,7 +2490,7 @@ class NegTwoConstant(IntegerExpression):
 @dataclass(unsafe_hash=True)
 @weight(24)
 class DownConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (1, 0)
 
     def __str__(self):
@@ -2424,7 +2500,7 @@ class DownConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(13)
 class RightConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (0, 1)
 
     def __str__(self):
@@ -2434,7 +2510,7 @@ class RightConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(8)
 class UpConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (-1, 0)
 
     def __str__(self):
@@ -2444,7 +2520,7 @@ class UpConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(6)
 class LeftConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (0, -1)
 
     def __str__(self):
@@ -2454,7 +2530,7 @@ class LeftConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(47)
 class OriginConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (0, 0)
 
     def __str__(self):
@@ -2464,7 +2540,7 @@ class OriginConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(43)
 class UnityConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (1, 1)
 
     def __str__(self):
@@ -2474,7 +2550,7 @@ class UnityConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(15)
 class NegUnityConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (-1, -1)
 
     def __str__(self):
@@ -2484,7 +2560,7 @@ class NegUnityConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(13)
 class UpRightConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (-1, 1)
 
     def __str__(self):
@@ -2494,7 +2570,7 @@ class UpRightConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(14)
 class DownLeftConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (1, -1)
 
     def __str__(self):
@@ -2504,7 +2580,7 @@ class DownLeftConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(9)
 class ZeroByTwoConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (0, 2)
 
     def __str__(self):
@@ -2514,7 +2590,7 @@ class ZeroByTwoConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(13)
 class TwoByZeroConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (2, 0)
 
     def __str__(self):
@@ -2524,7 +2600,7 @@ class TwoByZeroConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(11)
 class TwoByTwoConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (2, 2)
 
     def __str__(self):
@@ -2534,7 +2610,7 @@ class TwoByTwoConstant(TupleExpression):
 @dataclass(unsafe_hash=True)
 @weight(18)
 class ThreeByThreeConstant(TupleExpression):
-    def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
+    def evaluate(self, *args, **kwargs) -> optimized_dsl.IntegerTuple:
         return (3, 3)
 
     def __str__(self):

@@ -27,56 +27,47 @@ def get_most_common_color(grid: Grid) -> int:
 
 def calculate_shape_fitness(predicted_grid, target_grid, size=(10, 10)):
     """Downscales grids and compares them to get a shape similarity score."""
-    try:
-        predicted_resized = resize(
-            np.array(predicted_grid), size, anti_aliasing=True, preserve_range=True
-        ).astype(int)
-        target_resized = resize(
-            np.array(target_grid), size, anti_aliasing=True, preserve_range=True
-        ).astype(int)
+    predicted_resized = resize(
+        np.array(predicted_grid), size, anti_aliasing=True, preserve_range=True
+    ).astype(int)
+    target_resized = resize(
+        np.array(target_grid), size, anti_aliasing=True, preserve_range=True
+    ).astype(int)
 
-        matches = np.sum(predicted_resized == target_resized)
-        return matches / (size[0] * size[1])
-    except Exception:
-        return -1
+    matches = np.sum(predicted_resized == target_resized)
+    return matches / (size[0] * size[1])
 
 
 def calculate_placement_fitness(predicted_grid, target_grid):
     """Binarizes grids and compares them to get a placement similarity score."""
     # Determine the background color from the target grid
-    try:
-        background_color = get_most_common_color(target_grid)
+    background_color = get_most_common_color(target_grid)
 
-        # Binarize both grids based on the identified background color
-        # Cells matching the background become 0 (black).
-        # All other cells become 1 (white).
-        predicted_binary = (np.array(predicted_grid) != background_color).astype(int)
-        target_binary = (np.array(target_grid) != background_color).astype(int)
+    # Binarize both grids based on the identified background color
+    # Cells matching the background become 0 (black).
+    # All other cells become 1 (white).
+    predicted_binary = (np.array(predicted_grid) != background_color).astype(int)
+    target_binary = (np.array(target_grid) != background_color).astype(int)
 
-        if predicted_binary.shape != target_binary.shape:
-            return 0.0
+    if predicted_binary.shape != target_binary.shape:
+        return 0.0
 
-        # Compare the binarized grids and calculate the score
-        matches = np.sum(predicted_binary == target_binary)
-        return matches / predicted_binary.size
-    except Exception:
-        return -1
+    # Compare the binarized grids and calculate the score
+    matches = np.sum(predicted_binary == target_binary)
+    return matches / predicted_binary.size
 
 
 def calculate_pixel_fitness(predicted_grid, target_grid):
     """The original pixel-perfect comparison."""
-    try:
-        predicted_arr = np.array(predicted_grid)
-        target_arr = np.array(target_grid)
+    predicted_arr = np.array(predicted_grid)
+    target_arr = np.array(target_grid)
 
-        # Grids must have the same shape to be compared
-        if predicted_arr.shape != target_arr.shape:
-            return 0.0
+    # Grids must have the same shape to be compared
+    if predicted_arr.shape != target_arr.shape:
+        return 0.0
 
-        matches = np.sum(predicted_arr == target_arr)
-        return matches / predicted_arr.size
-    except Exception:
-        return -1
+    matches = np.sum(predicted_arr == target_arr)
+    return matches / predicted_arr.size
 
 
 def get_git_commit_hash() -> str:

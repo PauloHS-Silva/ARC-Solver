@@ -19,6 +19,7 @@ import time
 import csv
 import argparse
 import os
+import numpy as np
 
 from utils import (
     pretty_print_program,
@@ -118,7 +119,7 @@ def solve_task(task_id: str, output_dir: str) -> None:
 
     print(f"--- Starting search for task {task_id} ---")
     start_time = time.time()
-    best_individuals = alg.search()
+    pareto_front = alg.search()
     end_time = time.time()
     time_taken = end_time - start_time
     num_evaluations = alg.tracker.get_number_evaluations()
@@ -135,13 +136,13 @@ def solve_task(task_id: str, output_dir: str) -> None:
                 "train_fitness",
                 "test_fitness",
                 "solution_size",
-                "evaluations"
+                "evaluations",
                 "time_taken",
                 "solution_tree",
             ]
         )
 
-        if not best_individuals:
+        if not pareto_front:
             print(f"No solution found for task {task_id}")
             result_row = [
                 task_id,
@@ -153,7 +154,11 @@ def solve_task(task_id: str, output_dir: str) -> None:
                 "No solution found",
             ]
         else:
-            best_individual = best_individuals[0]
+            best_individual = sorted(
+                pareto_front,
+                key=lambda ind: np.mean(ind.get_fitness(problem).fitness_components),
+                reverse=True,
+            )[0]
             final_program = create_program(best_individual.get_phenotype())
             train_fitness = best_individual.get_fitness(problem)
             test_fitness = test_fitness_function(final_program, task)

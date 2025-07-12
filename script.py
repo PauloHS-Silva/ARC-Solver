@@ -135,7 +135,8 @@ def solve_task(task_id: str, output_dir: str) -> None:
                 "train_fitness",
                 "test_fitness",
                 "solution_size",
-                "evaluationstime_taken",
+                "evaluations"
+                "time_taken",
                 "solution_tree",
             ]
         )

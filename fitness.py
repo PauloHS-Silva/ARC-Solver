@@ -1,7 +1,7 @@
 from typing import Callable, List, Tuple
 from dsl import Grid
 import numpy as np
-from grammar import GridExpression, InputGrid
+from grammar import GridExpression
 from utils import (
     calculate_pixel_fitness,
     calculate_shape_fitness,
@@ -11,7 +11,6 @@ from utils import (
     create_program,
     Task,
 )
-from functools import lru_cache
 
 
 def single_pixel_fitness(program: Callable, dataset: List[Tuple[Grid, Grid]]) -> float:
@@ -52,12 +51,17 @@ def multi_pixel_fitness(
         score = 0.0
         if expected_output is not None:
             try:
+                input_arr = np.array(input_grid)
                 actual_output = np.array(program(input_grid))
                 expected_output = np.array(expected_output)
                 if actual_output.shape == expected_output.shape:
-                    score = (
-                        np.sum(actual_output == expected_output) / expected_output.size
-                    )
+                    if np.array_equal(input_arr, actual_output):
+                        score = -1
+                    else:
+                        score = (
+                            np.sum(actual_output == expected_output)
+                            / expected_output.size
+                        )
             except Exception:
                 score = -1
         scores.append(score)
@@ -72,22 +76,30 @@ def balanced_fitness(
         # Run the evolved program
         predicted_grid = program(input_grid=input_grid)
 
+        input_arr = np.array(input_grid)
+        predicted_arr = np.array(predicted_grid)
+
+        if np.array_equal(input_arr, predicted_arr):
+            all_scores.append(-1)
+            continue
         # Calculate the three different fitness scores
         pixel_score = calculate_pixel_fitness(predicted_grid, target_grid)
         shape_score = calculate_shape_fitness(predicted_grid, target_grid)
         placement_score = calculate_placement_fitness(predicted_grid, target_grid)
 
-        print(pixel_score, shape_score, placement_score)
+        # print(pixel_score, shape_score, placement_score)
 
-        w_pixel = 1 / 3  # Reward getting pixels right
-        w_shape = 1 / 3  # Reward correct general shape
-        w_placement = 1 / 3  # Reward correct object placement
+        w_pixel = 1  # Reward getting pixels right
+        w_shape = 1  # Reward correct general shape
+        w_placement = 1  # Reward correct object placement
+
+        weight_sum = w_pixel + w_shape + w_placement
 
         combined_score = (
             (w_pixel * pixel_score)
             + (w_shape * shape_score)
             + (w_placement * placement_score)
-        )
+        ) / weight_sum
 
         all_scores.append(combined_score)
 
@@ -97,7 +109,7 @@ def balanced_fitness(
 hack = {"best": -1}
 
 
-@lru_cache(maxsize=None)
+# @lru_cache(maxsize=None)
 def train_fitness_function(individual, task: Task):
     train, _ = task
     program = create_program(individual)
@@ -107,6 +119,11 @@ def train_fitness_function(individual, task: Task):
         # If the program crashes, it gets a negative score
         return [-1] * len(train)
 
+    num_nodes = count_nodes(individual)
+
+    if not program_uses_input(individual):
+        return [-1] * len(all_scores)
+
     if np.mean(all_scores) > hack["best"]:
         hack["best"] = np.mean(all_scores)
 
@@ -114,15 +131,6 @@ def train_fitness_function(individual, task: Task):
         print(
             f"{individual.__class__.__name__} {np.mean(all_scores):.2f} - {hack['best']:.2f}"
         )
-
-    if isinstance(individual, InputGrid):
-        return [-1] * len(all_scores)
-
-    # Program simply returns input grid
-    num_nodes = count_nodes(individual)
-
-    if not program_uses_input(individual):
-        return [-1] * len(all_scores)
 
     # Apply parsimony pressure to each score
     parsimony_coefficient = 0.0001

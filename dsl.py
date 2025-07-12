@@ -840,6 +840,8 @@ def underpaint(grid: Grid, obj: Object) -> Grid:
 
 def hupscale(grid: Grid, factor: Integer) -> Grid:
     """upscale grid horizontally"""
+    if factor * len(grid[0]) > 30:
+        raise ValueError
     g = tuple()
     for row in grid:
         r = tuple()
@@ -851,6 +853,8 @@ def hupscale(grid: Grid, factor: Integer) -> Grid:
 
 def vupscale(grid: Grid, factor: Integer) -> Grid:
     """upscale grid vertically"""
+    if factor * len(grid) > 30:
+        raise ValueError
     g = tuple()
     for row in grid:
         g = g + tuple(row for num in range(factor))
@@ -860,6 +864,13 @@ def vupscale(grid: Grid, factor: Integer) -> Grid:
 def upscale(element: Element, factor: Integer) -> Element:
     """upscale object or grid"""
     if isinstance(element, tuple):
+        if not element or not element[0]:
+            return element
+        h = len(element)
+        w = len(element[0])
+        # Check if the new height or width would exceed the limit
+        if (h * factor > 30) or (w * factor > 30):
+            raise ValueError
         g = tuple()
         for row in element:
             upscaled_row = tuple()
@@ -868,8 +879,12 @@ def upscale(element: Element, factor: Integer) -> Element:
             g = g + tuple(upscaled_row for num in range(factor))
         return g
     else:
-        if len(element) == 0:
+        if not element:
             return frozenset()
+        h = height(element)
+        w = width(element)
+        if (h * factor > 30) or (w * factor > 30):
+            raise ValueError
         di_inv, dj_inv = ulcorner(element)
         di, dj = (-di_inv, -dj_inv)
         normed_obj = shift(element, (di, dj))
@@ -901,11 +916,35 @@ def downscale(grid: Grid, factor: Integer) -> Grid:
 
 def hconcat(a: Grid, b: Grid) -> Grid:
     """concatenate two grids horizontally"""
+    if not a: return b
+    if not b: return a
+
+    h_a, w_a = len(a), len(a[0])
+    h_b, w_b = len(b), len(b[0])
+
+    if h_a != h_b:
+        raise ValueError("Grids must have the same height for hconcat")
+
+    if (w_a + w_b) > 30:
+        raise ValueError("Concatenated grid width cannot exceed 30")
+        
     return tuple(i + j for i, j in zip(a, b))
 
 
 def vconcat(a: Grid, b: Grid) -> Grid:
     """concatenate two grids vertically"""
+    if not a: return b
+    if not b: return a
+
+    h_a, w_a = len(a), len(a[0])
+    h_b, w_b = len(b), len(b[0])
+
+    if w_a != w_b:
+        raise ValueError("Grids must have the same width for vconcat")
+
+    if (h_a + h_b) > 30:
+        raise ValueError("Concatenated grid height cannot exceed 30")
+        
     return a + b
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Callable
 from geneticengine.problems import MultiObjectiveProblem
 from geneticengine.algorithms.gp.operators.selection import LexicaseSelection
 from geneticengine.algorithms.gp.operators.combinators import ParallelStep, SequenceStep
@@ -13,6 +13,7 @@ from geneticengine.evaluation.budget import TimeBudget
 from geneticengine.representations.tree.treebased import TreeBasedRepresentation
 from geneticengine.representations.tree.initializations import MaxDepthDecider
 from geneticengine.evaluation.tracker import ProgressTracker
+import numpy as np
 
 
 from utils import pretty_print_program, create_program, load_arc_task_by_id
@@ -20,7 +21,7 @@ from grammar import grammar, GridExpression
 from fitness import train_fitness_function, test_fitness_function
 
 
-def solve_task(task_id: str) -> None:
+def solve_task(task_id: str) -> Callable:
     task = load_arc_task_by_id(task_id)
     # Create the problem
 
@@ -88,19 +89,22 @@ def solve_task(task_id: str) -> None:
     #     problem=problem,
     #     budget=TimeBudget(time=gp_params["timer_limit"]),
     #     representation=TreeBasedRepresentation(grammar, decider=MaxDepthDecider(random, grammar, gp_params["max_depth"])),
-    #     random=random
+    #     random=random,
+    #     tracker=tracker
     # )
 
     # Run the search
-    best_individuals = alg.search()
-    best_individual = best_individuals[
-        0
-    ]  # Get the first (best) individual from the list
+    alg.search()
+    pareto_front = tracker.get_best_individuals()
+
+    best_individual = sorted(
+        pareto_front,
+        key=lambda ind: np.mean(ind.get_fitness(problem).fitness_components),
+        reverse=True,
+    )[0]
 
     print("\nBest solution found:")
-    print(
-        f"Train fitness: {train_fitness_function(best_individual.get_phenotype(), task)}"
-    )
+    print(f"Train fitness: {best_individual.get_fitness(problem).fitness_components}")
     print(
         f"Test fitness: {test_fitness_function(best_individual.get_phenotype(), task)}"
     )
@@ -114,4 +118,4 @@ def solve_task(task_id: str) -> None:
 
 if __name__ == "__main__":
     # Solve the specific task
-    program = solve_task("62c24649")
+    program = solve_task("4c4377d9")

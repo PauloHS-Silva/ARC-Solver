@@ -916,35 +916,31 @@ def downscale(grid: Grid, factor: Integer) -> Grid:
 
 def hconcat(a: Grid, b: Grid) -> Grid:
     """concatenate two grids horizontally"""
-    if not a: return b
-    if not b: return a
-
+    if not a:
+        return b
+    if not b:
+        return a
     h_a, w_a = len(a), len(a[0])
     h_b, w_b = len(b), len(b[0])
-
     if h_a != h_b:
-        raise ValueError("Grids must have the same height for hconcat")
-
+        raise ValueError
     if (w_a + w_b) > 30:
-        raise ValueError("Concatenated grid width cannot exceed 30")
-        
+        raise ValueError
     return tuple(i + j for i, j in zip(a, b))
 
 
 def vconcat(a: Grid, b: Grid) -> Grid:
     """concatenate two grids vertically"""
-    if not a: return b
-    if not b: return a
-
+    if not a:
+        return b
+    if not b:
+        return a
     h_a, w_a = len(a), len(a[0])
     h_b, w_b = len(b), len(b[0])
-
     if w_a != w_b:
-        raise ValueError("Grids must have the same width for vconcat")
-
+        raise ValueError
     if (h_a + h_b) > 30:
-        raise ValueError("Concatenated grid height cannot exceed 30")
-        
+        raise ValueError
     return a + b
 
 

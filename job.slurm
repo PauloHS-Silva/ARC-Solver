@@ -8,11 +8,12 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
-#SBATCH --time=0:03:30
-#SBATCH --nodelist=corsa
+#SBATCH --time=1:00:00
 
 # Job Array
 #SBATCH --array=1-400
+
+SEED=1
 
 # Environment Setup
 export PYTHONPATH=/mnt/storage/admindi/home/phsilva/aeon:$PYTHONPATH
@@ -26,9 +27,10 @@ echo "------------------------------------------------"
 echo "SLURM JOB ID: $SLURM_JOB_ID"
 echo "SLURM ARRAY TASK ID: $SLURM_ARRAY_TASK_ID"
 echo "Assigned ARC Task ID: $TASK_ID"
+echo "Assigned Seed: $SEED"
 echo "------------------------------------------------"
 
-# Run the Python solver
-python script.py --task_id "$TASK_ID" --output_dir "arc_results"
+# Run the Python solver, now passing the configured seed
+/mnt/storage/admindi/home/phsilva/miniconda3/envs/aeon/bin/python script.py --task_id "$TASK_ID" --seed "$SEED" --output_dir "arc_results"
 
 echo "Job finished."

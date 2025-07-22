@@ -23,7 +23,6 @@ import numpy as np
 
 from utils import (
     pretty_print_program,
-    create_program,
     load_arc_task_by_id,
     count_nodes,
     get_git_commit_hash,
@@ -32,23 +31,22 @@ from grammar import grammar
 from fitness import train_fitness_function, test_fitness_function
 
 
-def solve_task(task_id: str, output_dir: str) -> None:
+def solve_task(task_id: str, seed: int, output_dir: str) -> None:
     # Get versioninig information
     dsl_version = get_git_commit_hash()
-    algorithm_version = "multi_objective_lexicase"
+    algorithm_version = "conditional_weight_learning"
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
-    # Define a unique CSV file path FOR THIS TASK inside the output directory
-    csv_file_path = os.path.join(output_dir, f"{task_id}.csv")
+    # Define a unique CSV file path for this task inside the output directory
+    csv_file_path = os.path.join(output_dir, f"{task_id}_seed_{seed}.csv")
 
     if os.path.exists(csv_file_path):
         print(f"Result for task {task_id} already exists. Skipping.")
         return
 
     task = load_arc_task_by_id(task_id)
-    # Create the problem
 
     def task_train_fitness(individual: Individual) -> List[float]:
         """
@@ -70,10 +68,11 @@ def solve_task(task_id: str, output_dir: str) -> None:
         "n_elites": 4,
         "probability_mutation": 0.15,
         "probability_crossover": 0.8,
-        "timer_limit": 175,
+        "timer_limit": 178,
         "novelty": 15,
-        "max_depth": 10,
+        "max_depth": 5,
         "tournament_size": 5,
+        "evaluation_limit": 20_000,
     }
 
     # Create the GP step
@@ -93,10 +92,10 @@ def solve_task(task_id: str, output_dir: str) -> None:
     )
 
     # Create and run the algorithm
-    random = NativeRandomSource(42)
+    random = NativeRandomSource(seed)
     alg = GeneticProgramming(
         problem=problem,
-        budget=TimeBudget(time=gp_params["timer_limit"]),
+        budget=TimeBudget(gp_params["timer_limit"]),
         representation=TreeBasedRepresentation(
             grammar=grammar,
             decider=MaxDepthDecider(random, grammar, gp_params["max_depth"]),
@@ -112,7 +111,7 @@ def solve_task(task_id: str, output_dir: str) -> None:
 
     # alg = RandomSearch(
     #     problem=problem,
-    #     budget=TimeBudget(time=gp_params["timer_limit"]),
+    #     budget=TimeBudget(gp_params["timer_limit"]),
     #     representation=TreeBasedRepresentation(grammar, decider=MaxDepthDecider(random, grammar, gp_params["max_depth"])),
     #     random=random
     # )
@@ -149,6 +148,8 @@ def solve_task(task_id: str, output_dir: str) -> None:
                 dsl_version,
                 algorithm_version,
                 0.0,
+                0.0,
+                "N/A",
                 num_evaluations,
                 time_taken,
                 "No solution found",
@@ -156,12 +157,14 @@ def solve_task(task_id: str, output_dir: str) -> None:
         else:
             best_individual = sorted(
                 pareto_front,
-                key=lambda ind: np.mean(ind.get_fitness(problem).fitness_components),
+                key=lambda ind: (
+                    ind.get_fitness(problem).fitness_components.count(1),
+                    np.mean(ind.get_fitness(problem).fitness_components),
+                ),
                 reverse=True,
             )[0]
-            final_program = create_program(best_individual.get_phenotype())
             train_fitness = best_individual.get_fitness(problem)
-            test_fitness = test_fitness_function(final_program, task)
+            test_fitness = test_fitness_function(best_individual.get_phenotype(), task)
             solution_size = count_nodes(best_individual.get_phenotype())
             solution_str = pretty_print_program(best_individual.get_phenotype())
             result_row = [
@@ -190,6 +193,9 @@ if __name__ == "__main__":
         "--task_id", required=True, type=str, help="The ID of the ARC task to solve."
     )
     parser.add_argument(
+        "--seed", required=True, type=int, help="The random seed for the run."
+    )
+    parser.add_argument(
         "--output_dir",
         default="arc_results",
         type=str,
@@ -199,4 +205,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Call the solver with the provided arguments
-    solve_task(args.task_id, args.output_dir)
+    solve_task(args.task_id, args.seed, args.output_dir)

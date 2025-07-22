@@ -1,13 +1,11 @@
-from typing import Union, Tuple, Any, Container, Callable, FrozenSet, Annotated
-from geneticengine.grammar.metahandlers.lists import ListSizeBetween
+from typing import Union, Tuple, Any, Container, Callable, FrozenSet
 
 Boolean = bool
 Integer = int
 IntegerTuple = Tuple[Integer, Integer]
 Numerical = Union[Integer, IntegerTuple]
 IntegerSet = FrozenSet[Integer]
-Row = Annotated[Tuple[Integer], ListSizeBetween(1, 30)]
-Grid = Annotated[Tuple[Row], ListSizeBetween(1, 30)]
+Grid = Tuple[Tuple[Integer]]
 Cell = Tuple[Integer, IntegerTuple]
 Object = FrozenSet[Cell]
 Objects = FrozenSet[Object]
@@ -719,7 +717,7 @@ def palette(element: Element) -> IntegerSet:
     return frozenset({v for v, _ in element})
 
 
-def numcolors(element: Element) -> IntegerSet:
+def numcolors(element: Element) -> Integer:
     """number of colors occurring in object or grid"""
     return len(palette(element))
 

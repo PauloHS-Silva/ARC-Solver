@@ -25,42 +25,49 @@ class Expression(ABC):
 @abstract
 class NumericalExpression(Expression):
     """An expression that evaluates to a numerical value."""
+
     def evaluate(self, *args, **kwargs) -> dsl.Numerical: ...
 
 
 @abstract
 class BooleanExpression(Expression):
     """An expression that evaluates to a boolean value."""
+
     def evaluate(self, *args, **kwargs) -> bool: ...
 
 
 @abstract
 class GridExpression(Expression):
     """An expression that evaluates to a Grid."""
+
     def evaluate(self, *args, **kwargs) -> dsl.Grid: ...
 
 
 @abstract
 class ObjectExpression(Expression):
     """An expression that evaluates to an Object."""
+
     def evaluate(self, *args, **kwargs) -> dsl.Object: ...
 
 
 @abstract
 class ObjectsExpression(Expression):
     """An expression that evaluates to a collection of Objects."""
+
     def evaluate(self, *args, **kwargs) -> dsl.Objects: ...
 
 
 @abstract
 class IndicesExpression(Expression):
     """An expression that evaluates to a set of indices."""
+
     def evaluate(self, *args, **kwargs) -> dsl.Indices: ...
 
 
 @abstract
 class IntegerExpression(NumericalExpression):
     """An expression that evaluates to an integer value."""
+
     def evaluate(self, *args, **kwargs) -> int: ...
 
 
@@ -84,6 +91,7 @@ class FrozenSetExpression(ContainerExpression):
 
     def evaluate(self, *args, **kwargs) -> FrozenSet: ...
 
+
 @abstract
 class IntegerSetExpression(ContainerExpression):
     """An expression that evaluates to an IntegerSet."""
@@ -106,6 +114,7 @@ class CallableExpression(Expression):
 @dataclass(unsafe_hash=True)
 class Constant(IntegerExpression):
     """A constant integer value."""
+
     value: int
 
     def evaluate(self, *args, **kwargs) -> int:
@@ -131,460 +140,590 @@ class InputGrid(GridExpression):
 # DSL Functions as Classes
 # ======================================================================================
 
+
 @dataclass(unsafe_hash=True)
 @weight(0)
 class Identity(Expression):
     """Represents the identity function."""
+
     x: Expression
 
     def evaluate(self, *args, **kwargs) -> Any:
         return dsl.identity(self.x.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(124)
 class SizeFunc(CallableExpression):
     """Represents the size function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.size
+
 
 @dataclass(unsafe_hash=True)
 @weight(6)
 class CornersFunc(CallableExpression):
     """Represents the corners function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.corners
+
 
 @dataclass(unsafe_hash=True)
 @weight(3)
 class TophalfFunc(CallableExpression):
     """Represents the tophalf function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.tophalf
+
 
 @dataclass(unsafe_hash=True)
 @weight(3)
 class LefthalfFunc(CallableExpression):
     """Represents the lefthalf function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.lefthalf
+
 
 @dataclass(unsafe_hash=True)
 @weight(39)
 class NeighborsFunc(CallableExpression):
     """Represents the neighbors function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.neighbors
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
 class HsplitFunc(CallableExpression):
     """Represents the hsplit function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.hsplit
+
 
 @dataclass(unsafe_hash=True)
 @weight(19)
 class NumcolorsFunc(CallableExpression):
     """Represents the numcolors function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.numcolors
+
 
 @dataclass(unsafe_hash=True)
 @weight(18)
 class EqualityFunc(CallableExpression):
     """Represents the equality function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.equality
+
 
 @dataclass(unsafe_hash=True)
 @weight(20)
 class DmirrorFunc(CallableExpression):
     """Represents the dmirror function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.dmirror
+
 
 @dataclass(unsafe_hash=True)
 @weight(72)
 class IdentityFunc(CallableExpression):
     """Represents the identity function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.identity
+
 
 @dataclass(unsafe_hash=True)
 @weight(24)
 class FlipFunc(CallableExpression):
     """Represents the flip function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.flip
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
 class SquareFunc(CallableExpression):
     """Represents the square function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.square
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
 class OrderFunc(CallableExpression):
     """Represents the order function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.order
+
 
 @dataclass(unsafe_hash=True)
 @weight(16)
 class HeightFunc(CallableExpression):
     """Represents the height function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.height
+
 
 @dataclass(unsafe_hash=True)
 @weight(10)
 class DeltaFunc(CallableExpression):
     """Represents the delta function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.delta
+
 
 @dataclass(unsafe_hash=True)
 @weight(32)
 class MultiplyFunc(CallableExpression):
     """Represents the multiply function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.multiply
+
 
 @dataclass(unsafe_hash=True)
 @weight(19)
 class WidthFunc(CallableExpression):
     """Represents the width function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.width
+
 
 @dataclass(unsafe_hash=True)
 @weight(10)
 class BorderingFunc(CallableExpression):
     """Represents the bordering function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.bordering
+
 
 @dataclass(unsafe_hash=True)
 @weight(21)
 class CombineFunc(CallableExpression):
     """Represents the combine function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.combine
+
 
 @dataclass(unsafe_hash=True)
 @weight(18)
 class VfrontierFunc(CallableExpression):
     """Represents the vfrontier function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.vfrontier
+
 
 @dataclass(unsafe_hash=True)
 @weight(15)
 class HfrontierFunc(CallableExpression):
     """Represents the hfrontier function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.hfrontier
+
 
 @dataclass(unsafe_hash=True)
 @weight(28)
 class CenterFunc(CallableExpression):
     """Represents the center function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.center
+
 
 @dataclass(unsafe_hash=True)
 @weight(19)
 class ColorcountFunc(CallableExpression):
     """Represents the colorcount function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.colorcount
+
 
 @dataclass(unsafe_hash=True)
 @weight(42)
 class RecolorFunc(CallableExpression):
     """Represents the recolor function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.recolor
+
 
 @dataclass(unsafe_hash=True)
 @weight(54)
 class ColorFunc(CallableExpression):
     """Represents the color function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.color
+
 
 @dataclass(unsafe_hash=True)
 @weight(13)
 class BackdropFunc(CallableExpression):
     """Represents the backdrop function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.backdrop
+
 
 @dataclass(unsafe_hash=True)
 @weight(7)
 class InboxFunc(CallableExpression):
     """Represents the inbox function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.inbox
+
 
 @dataclass(unsafe_hash=True)
 @weight(14)
 class DifferenceFunc(CallableExpression):
     """Represents the difference function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.difference
+
 
 @dataclass(unsafe_hash=True)
 @weight(27)
 class ToindicesFunc(CallableExpression):
     """Represents the toindices function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.toindices
+
 
 @dataclass(unsafe_hash=True)
 @weight(7)
 class BoxFunc(CallableExpression):
     """Represents the box function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.box
+
 
 @dataclass(unsafe_hash=True)
 @weight(26)
 class ShootFunc(CallableExpression):
     """Represents the shoot function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.shoot
+
 
 @dataclass(unsafe_hash=True)
 @weight(10)
 class AdjacentFunc(CallableExpression):
     """Represents the adjacent function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.adjacent
+
 
 @dataclass(unsafe_hash=True)
 @weight(8)
 class EvenFunc(CallableExpression):
     """Represents the even function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.even
+
 
 @dataclass(unsafe_hash=True)
 @weight(65)
 class LastFunc(CallableExpression):
     """Represents the last function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.last
+
 
 @dataclass(unsafe_hash=True)
 @weight(15)
 class InvertFunc(CallableExpression):
     """Represents the invert function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.invert
+
 
 @dataclass(unsafe_hash=True)
 @weight(79)
 class ShiftFunc(CallableExpression):
     """Represents the shift function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.shift
+
 
 @dataclass(unsafe_hash=True)
 @weight(39)
 class AddFunc(CallableExpression):
     """Represents the add function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.add
+
 
 @dataclass(unsafe_hash=True)
 @weight(92)
 class FirstFunc(CallableExpression):
     """Represents the first function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.first
+
 
 @dataclass(unsafe_hash=True)
 @weight(27)
 class NormalizeFunc(CallableExpression):
     """Represents the normalize function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.normalize
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
 class CrementFunc(CallableExpression):
     """Represents the crement function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.crement
+
 
 @dataclass(unsafe_hash=True)
 @weight(6)
 class GravitateFunc(CallableExpression):
     """Represents the gravitate function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.gravitate
+
 
 @dataclass(unsafe_hash=True)
 @weight(10)
 class ToivecFunc(CallableExpression):
     """Represents the toivec function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.toivec
+
 
 @dataclass(unsafe_hash=True)
 @weight(29)
 class UlcornerFunc(CallableExpression):
     """Represents the ulcorner function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.ulcorner
+
 
 @dataclass(unsafe_hash=True)
 @weight(12)
 class PairFunc(CallableExpression):
     """Represents the pair function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.pair
+
 
 @dataclass(unsafe_hash=True)
 @weight(9)
 class DoubleFunc(CallableExpression):
     """Represents the double function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.double
+
 
 @dataclass(unsafe_hash=True)
 @weight(16)
 class DecrementFunc(CallableExpression):
     """Represents the decrement function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.decrement
+
 
 @dataclass(unsafe_hash=True)
 @weight(1)
 class LeastcolorFunc(CallableExpression):
     """Represents the leastcolor function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.leastcolor
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
 class IneighborsFunc(CallableExpression):
     """Represents the ineighbors function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.ineighbors
+
 
 @dataclass(unsafe_hash=True)
 @weight(6)
 class RightmostFunc(CallableExpression):
     """Represents the rightmost function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.rightmost
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
 class AsobjectFunc(CallableExpression):
     """Represents the asobject function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.asobject
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
 class DedupeFunc(CallableExpression):
     """Represents the dedupe function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.dedupe
+
 
 @dataclass(unsafe_hash=True)
 @weight(16)
 class ToobjectFunc(CallableExpression):
     """Represents the toobject function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.toobject
+
 
 @dataclass(unsafe_hash=True)
 @weight(26)
 class ConnectFunc(CallableExpression):
     """Represents the connect function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.connect
+
 
 @dataclass(unsafe_hash=True)
 @weight(13)
 class EitherFunc(CallableExpression):
     """Represents the either function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.either
+
 
 @dataclass(unsafe_hash=True)
 @weight(15)
 class VlineFunc(CallableExpression):
     """Represents the vline function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.vline
+
 
 @dataclass(unsafe_hash=True)
 @weight(15)
 class HlineFunc(CallableExpression):
     """Represents the hline function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.hline
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
 class ColorfilterFunc(CallableExpression):
     """Represents the colorfilter function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.colorfilter
+
 
 @dataclass(unsafe_hash=True)
 @weight(17)
 class AstupleFunc(CallableExpression):
     """Represents the astuple function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.astuple
+
 
 @dataclass(unsafe_hash=True)
 @weight(11)
 class ManhattanFunc(CallableExpression):
     """Represents the manhattan function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.manhattan
+
 
 @dataclass(unsafe_hash=True)
 @weight(2)
 class Rot90Func(CallableExpression):
     """Represents the rot90 function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.rot90
+
 
 @dataclass(unsafe_hash=True)
 @weight(22)
 class OutboxFunc(CallableExpression):
     """Represents the outbox function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.outbox
+
 
 @dataclass(unsafe_hash=True)
 @weight(8)
 class SubgridFunc(CallableExpression):
     """Represents the subgrid function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.subgrid
+
 
 @dataclass(unsafe_hash=True)
 @weight(20)
 class GreaterFunc(CallableExpression):
     """Represents the greater function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.greater
+
 
 @dataclass(unsafe_hash=True)
 @weight(14)
 class PaletteFunc(CallableExpression):
     """Represents the palette function as a callable."""
+
     def evaluate(self, *args, **kwargs) -> Callable:
         return dsl.palette
 
@@ -593,6 +732,7 @@ class PaletteFunc(CallableExpression):
 @weight(11)
 class AddInteger(IntegerExpression):
     """Adds two integers."""
+
     left: IntegerExpression
     right: IntegerExpression
 
@@ -604,6 +744,7 @@ class AddInteger(IntegerExpression):
 @weight(11)
 class AddTuple(TupleExpression):
     """Adds the values in a pairs of tuples."""
+
     left: TupleExpression
     right: TupleExpression
 
@@ -615,6 +756,7 @@ class AddTuple(TupleExpression):
 @weight(59)
 class SubtractInteger(IntegerExpression):
     """Subtracts two integers."""
+
     left: IntegerExpression
     right: IntegerExpression
 
@@ -626,6 +768,7 @@ class SubtractInteger(IntegerExpression):
 @weight(59)
 class SubtractTuple(TupleExpression):
     """Subtracts the values in a pairs of tuples."""
+
     left: TupleExpression
     right: TupleExpression
 
@@ -637,6 +780,7 @@ class SubtractTuple(TupleExpression):
 @weight(9)
 class MultiplyInteger(IntegerExpression):
     """Multiplies two integers."""
+
     left: IntegerExpression
     right: IntegerExpression
 
@@ -648,6 +792,7 @@ class MultiplyInteger(IntegerExpression):
 @weight(9)
 class MultiplyTuple(TupleExpression):
     """Multiplies the values in a pairs of tuples."""
+
     left: TupleExpression
     right: TupleExpression
 
@@ -659,6 +804,7 @@ class MultiplyTuple(TupleExpression):
 @weight(7)
 class DivideInteger(IntegerExpression):
     """Divides two integers."""
+
     left: IntegerExpression
     right: IntegerExpression
 
@@ -670,6 +816,7 @@ class DivideInteger(IntegerExpression):
 @weight(7)
 class DivideTuple(TupleExpression):
     """Divides the values in a pairs of tuples."""
+
     left: TupleExpression
     right: TupleExpression
 
@@ -681,6 +828,7 @@ class DivideTuple(TupleExpression):
 @weight(3)
 class InvertInteger(IntegerExpression):
     """Inverts an integer with respect to addition."""
+
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
@@ -691,6 +839,7 @@ class InvertInteger(IntegerExpression):
 @weight(3)
 class InvertTuple(TupleExpression):
     """Inverts a tuple with respect to addition."""
+
     n: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -701,6 +850,7 @@ class InvertTuple(TupleExpression):
 @weight(1)
 class Even(BooleanExpression):
     """Checks if an integer is even."""
+
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
@@ -711,6 +861,7 @@ class Even(BooleanExpression):
 @weight(5)
 class DoubleInteger(IntegerExpression):
     """Scales an integer by two."""
+
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
@@ -721,6 +872,7 @@ class DoubleInteger(IntegerExpression):
 @weight(5)
 class DoubleTuple(TupleExpression):
     """Scales a tuple by two."""
+
     n: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -731,6 +883,7 @@ class DoubleTuple(TupleExpression):
 @weight(9)
 class HalveInteger(IntegerExpression):
     """Scales an integer by one half."""
+
     n: IntegerExpression
 
     def evaluate(self, *args, **kwargs) -> int:
@@ -741,6 +894,7 @@ class HalveInteger(IntegerExpression):
 @weight(9)
 class HalveTuple(TupleExpression):
     """Scales a tuple by one half."""
+
     n: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -751,6 +905,7 @@ class HalveTuple(TupleExpression):
 @weight(1)
 class Flip(BooleanExpression):
     """Flips a boolean value."""
+
     b: BooleanExpression
 
     def evaluate(self, *args, **kwargs) -> bool:
@@ -761,6 +916,7 @@ class Flip(BooleanExpression):
 @weight(26)
 class Equality(BooleanExpression):
     """Checks if two values are equal."""
+
     left: Expression
     right: Expression
 
@@ -1039,6 +1195,7 @@ class IncrementInteger(IntegerExpression):
 @weight(18)
 class IncrementTuple(TupleExpression):
     """Increments the values in a tuple by 1."""
+
     x: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -1060,6 +1217,7 @@ class DecrementInteger(IntegerExpression):
 @weight(12)
 class DecrementTuple(TupleExpression):
     """Decrements the values in a tuple by 1."""
+
     x: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -1081,6 +1239,7 @@ class CrementInteger(IntegerExpression):
 @weight(1)
 class CrementTuple(TupleExpression):
     """Increments positive values, decrements negative values."""
+
     x: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -1102,6 +1261,7 @@ class SignInteger(IntegerExpression):
 @weight(9)
 class SignTuple(TupleExpression):
     """Returns the sign of the values in a tuple."""
+
     x: TupleExpression
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
@@ -1530,8 +1690,8 @@ class MostcolorObject(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.mostcolor(self.element.evaluate(**kwargs))
-    
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(23)
 class MostcolorGrid(IntegerExpression):
@@ -1552,7 +1712,8 @@ class LeastcolorObject(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.leastcolor(self.element.evaluate(**kwargs))
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(22)
 class LeastcolorGrid(IntegerExpression):
@@ -1573,7 +1734,7 @@ class HeightGrid(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.height(self.piece.evaluate(**kwargs))
-    
+
 
 @dataclass(unsafe_hash=True)
 @weight(9)
@@ -1584,8 +1745,8 @@ class HeightObject(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.height(self.piece.evaluate(**kwargs))
-    
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(9)
 class HeightIndices(IntegerExpression):
@@ -1608,7 +1769,6 @@ class WidthGrid(IntegerExpression):
         return dsl.width(self.piece.evaluate(**kwargs))
 
 
-
 @dataclass(unsafe_hash=True)
 @weight(11)
 class WidthObject(IntegerExpression):
@@ -1629,7 +1789,7 @@ class WidthIndices(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.width(self.piece.evaluate(**kwargs))
-    
+
 
 @dataclass(unsafe_hash=True)
 @weight(30)
@@ -1640,7 +1800,7 @@ class ShapeGrid(TupleExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
         return dsl.shape(self.piece.evaluate(**kwargs))
-    
+
 
 @dataclass(unsafe_hash=True)
 @weight(30)
@@ -1673,8 +1833,8 @@ class PortraitGrid(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.portrait(self.piece.evaluate(**kwargs))
-    
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(12)
 class PortraitObject(BooleanExpression):
@@ -1709,7 +1869,8 @@ class ColorcountObject(IntegerExpression):
         return dsl.colorcount(
             self.element.evaluate(**kwargs), self.value.evaluate(**kwargs)
         )
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(2)
 class ColorcountGrid(IntegerExpression):
@@ -1901,7 +2062,8 @@ class RecolorObject(ObjectExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Object:
         return dsl.recolor(self.value.evaluate(**kwargs), self.patch.evaluate(**kwargs))
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(10)
 class RecolorIndices(ObjectExpression):
@@ -1926,6 +2088,7 @@ class ShiftObject(ObjectExpression):
         return dsl.shift(
             self.patch.evaluate(**kwargs), self.directions.evaluate(**kwargs)
         )
+
 
 @dataclass(unsafe_hash=True)
 @weight(32)
@@ -2047,6 +2210,7 @@ class UppermostObject(IntegerExpression):
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.uppermost(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(23)
 class UppermostIndices(IntegerExpression):
@@ -2067,6 +2231,7 @@ class LowermostObject(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.lowermost(self.patch.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(7)
@@ -2089,6 +2254,7 @@ class LeftmostObject(IntegerExpression):
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.leftmost(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(7)
 class LeftmostIndices(IntegerExpression):
@@ -2110,6 +2276,7 @@ class RightmostObject(IntegerExpression):
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.rightmost(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(0)
 class RightmostIndices(IntegerExpression):
@@ -2130,7 +2297,8 @@ class SquareGrid(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.square(self.piece.evaluate(**kwargs))
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(0)
 class SquareObject(BooleanExpression):
@@ -2140,6 +2308,7 @@ class SquareObject(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.square(self.piece.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(0)
@@ -2162,6 +2331,7 @@ class VlineObject(BooleanExpression):
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.vline(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(2)
 class VlineIndices(BooleanExpression):
@@ -2182,6 +2352,7 @@ class HlineObject(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.hline(self.patch.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(1)
@@ -2204,6 +2375,7 @@ class HmatchingObject(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.hmatching(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
@@ -2228,6 +2400,7 @@ class VmatchingObject(BooleanExpression):
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.vmatching(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(7)
 class VmatchingIndices(BooleanExpression):
@@ -2251,6 +2424,7 @@ class ManhattanObject(IntegerExpression):
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.manhattan(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(0)
 class ManhattanIndices(IntegerExpression):
@@ -2273,6 +2447,7 @@ class AdjacentObject(BooleanExpression):
 
     def evaluate(self, *args, **kwargs) -> bool:
         return dsl.adjacent(self.a.evaluate(**kwargs), self.b.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(0)
@@ -2299,6 +2474,7 @@ class BorderingObject(BooleanExpression):
             self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs)
         )
 
+
 @dataclass(unsafe_hash=True)
 @weight(0)
 class BorderingIndices(BooleanExpression):
@@ -2323,6 +2499,7 @@ class CenterofmassObject(TupleExpression):
     def evaluate(self, *args, **kwargs) -> dsl.IntegerTuple:
         return dsl.centerofmass(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(3)
 class CenterofmassIndices(TupleExpression):
@@ -2343,7 +2520,7 @@ class PaletteObject(IntegerSetExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.IntegerSet:
         return dsl.palette(self.element.evaluate(**kwargs))
-    
+
 
 @dataclass(unsafe_hash=True)
 @weight(9)
@@ -2365,8 +2542,8 @@ class NumcolorsObject(IntegerExpression):
 
     def evaluate(self, *args, **kwargs) -> int:
         return dsl.numcolors(self.element.evaluate(**kwargs))
-    
-    
+
+
 @dataclass(unsafe_hash=True)
 @weight(23)
 class NumcolorsGrid(IntegerExpression):
@@ -2399,6 +2576,7 @@ class ToobjectObject(ObjectExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Object:
         return dsl.toobject(self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
@@ -2510,6 +2688,7 @@ class VmirrorObject(ObjectExpression):
     def evaluate(self, *args, **kwargs) -> dsl.Object:
         return dsl.vmirror(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(47)
 class VmirrorIndices(IndicesExpression):
@@ -2541,6 +2720,7 @@ class DmirrorObject(ObjectExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Object:
         return dsl.dmirror(self.patch.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(5)
@@ -2574,6 +2754,7 @@ class CmirrorObject(ObjectExpression):
     def evaluate(self, *args, **kwargs) -> dsl.Object:
         return dsl.cmirror(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(13)
 class CmirrorIndices(IndicesExpression):
@@ -2600,6 +2781,7 @@ class FillObject(ObjectExpression):
             self.value.evaluate(**kwargs),
             self.patch.evaluate(**kwargs),
         )
+
 
 @dataclass(unsafe_hash=True)
 @weight(287)
@@ -2645,6 +2827,7 @@ class UnderfillObject(GridExpression):
             self.value.evaluate(**kwargs),
             self.patch.evaluate(**kwargs),
         )
+
 
 @dataclass(unsafe_hash=True)
 @weight(35)
@@ -2777,6 +2960,7 @@ class SubgridObject(GridExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Grid:
         return dsl.subgrid(self.patch.evaluate(**kwargs), self.grid.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(29)
@@ -2946,7 +3130,7 @@ class CornersObject(IndicesExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Indices:
         return dsl.corners(self.patch.evaluate(**kwargs))
-        
+
 
 @dataclass(unsafe_hash=True)
 @weight(9)
@@ -2981,7 +3165,7 @@ class CoverObject(GridExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Grid:
         return dsl.cover(self.grid.evaluate(**kwargs), self.patch.evaluate(**kwargs))
-        
+
 
 @dataclass(unsafe_hash=True)
 @weight(23)
@@ -3099,6 +3283,7 @@ class BackdropObject(IndicesExpression):
     def evaluate(self, *args, **kwargs) -> dsl.Indices:
         return dsl.backdrop(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(2)
 class BackdropIndices(IndicesExpression):
@@ -3119,6 +3304,7 @@ class DeltaObject(IndicesExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Indices:
         return dsl.delta(self.patch.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(14)
@@ -3143,6 +3329,7 @@ class GravitateObject(TupleExpression):
         return dsl.gravitate(
             self.source.evaluate(**kwargs), self.destination.evaluate(**kwargs)
         )
+
 
 @dataclass(unsafe_hash=True)
 @weight(3)
@@ -3190,6 +3377,7 @@ class OutboxObject(IndicesExpression):
     def evaluate(self, *args, **kwargs) -> dsl.Indices:
         return dsl.outbox(self.patch.evaluate(**kwargs))
 
+
 @dataclass(unsafe_hash=True)
 @weight(2)
 class OutboxIndices(IndicesExpression):
@@ -3210,6 +3398,7 @@ class BoxObject(IndicesExpression):
 
     def evaluate(self, *args, **kwargs) -> dsl.Indices:
         return dsl.box(self.patch.evaluate(**kwargs))
+
 
 @dataclass(unsafe_hash=True)
 @weight(4)
